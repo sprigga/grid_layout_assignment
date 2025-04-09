@@ -165,6 +165,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-Sprigga - [your.email@example.com](mailto:your.email@example.com)
+sprigga - [sprigga@gmail.com](mailto:your.email@example.com)
 
 Project Link: [https://github.com/sprigga/grid_layout_assignment](https://github.com/sprigga/grid_layout_assignment)
