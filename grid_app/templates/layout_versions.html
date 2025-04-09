@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Layout Versions</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 90%;
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            border-collapse: collapse;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: 500;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .action-header {
+            text-align: center;
+        }
+
+        .grid-table {
+            width: 100%;
+            margin: 10px 0;
+            background-color: #f8f8f8;
+        }
+
+        .grid-table th {
+            background-color: #666;
+            color: white;
+            padding: 8px;
+            font-size: 14px;
+        }
+
+        .grid-table td {
+            padding: 8px;
+            font-size: 14px;
+        }
+
+        .toggle-btn {
+            color: #4CAF50;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        .toggle-btn:hover {
+            color: #45a049;
+        }
+
+        a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        a:hover {
+            color: #45a049;
+            text-decoration: underline;
+        }
+
+        .delete-btn {
+            color: #d32f2f;
+        }
+
+        .delete-btn:hover {
+            color: #b71c1c;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        .back-link a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .back-link a:hover {
+            background-color: #45a049;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Layout Versions</h1>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Created At</th>
+            <th class="action-header" colspan="2">Actions</th>
+        </tr>
+        {% for version in versions %}
+        <tr>
+            <td>{{ version.id }}</td>
+            <td>
+                {{ version.name }}
+                <br>
+                <span class="toggle-btn" data-version-id="{{ version.id }}">Visible/Invisible Grid List</span>
+            </td>
+            <td>{{ version.created_at }}</td>
+            <td><a href="/?layout_id={{ version.id }}">Load</a></td>
+            <td><a href="#" class="delete-btn" data-version-id="{{ version.id }}">Delete</a></td>
+        </tr>
+        <tr>
+            <td colspan="5">
+                <table class="grid-table" id="grid-table-{{ version.id }}">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>X Position</th>
+                        <th>Y Position</th>
+                        <th>Width</th>
+                        <th>Height</th>
+                        <th>Created At</th>
+                        <th>Updated At</th>
+                    </tr>
+                    {% for grid in version.grids %}
+                    <tr>
+                        <td>{{ grid.id }}</td>
+                        <td>{{ grid.name }}</td>
+                        <td>{{ grid.x }}</td>
+                        <td>{{ grid.y }}</td>
+                        <td>{{ grid.width }}</td>
+                        <td>{{ grid.height }}</td>
+                        <td>{{ grid.created_at }}</td>
+                        <td>{{ grid.updated_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <p class="back-link"><a href="/">Back to Editor</a></p>
+
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // 刪除功能
+            $('.delete-btn').click(function(e) {
+                e.preventDefault();
+                const versionId = $(this).data('version-id');
+                if (confirm('Are you sure you want to delete this layout version? This will also delete all associated grid data.')) {
+                    $.ajax({
+                        url: '/delete-layout-version/' + versionId + '/',
+                        type: 'POST',
+                        data: {
+                            csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
+                        },
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                alert('Layout has been deleted!');
+                                location.reload();
+                            } else {
+                                alert('Delete failed: ' + response.message);
+                            }
+                        },
+                        error: function(error) {
+                            console.error('Delete failed: ', error);
+                            alert('Delete failed, please check console.');
+                        }
+                    });
+                }
+            });
+
+            // 切換 Grid 列表顯示/隱藏
+            $('.toggle-btn').click(function() {
+                const versionId = $(this).data('version-id');
+                const gridTable = $('#grid-table-' + versionId);
+                gridTable.toggle(); // 顯示或隱藏
+            });
+        });
+    </script>
+</body>
+</html>
