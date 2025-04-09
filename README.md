@@ -35,7 +35,7 @@ A Django-based web application for creating and managing customizable grid layou
 ![Grid Editor Interface](screenshots/grid_editor.png)
 
 ### Layout Versions Management
-<!-- ![Layout Versions Management](screenshots/layout_versions.png) -->
+![Layout Versions Management](screenshots/layout_versions.png)
 
 ### User Registration
 ![User Registration](screenshots/register.png)
