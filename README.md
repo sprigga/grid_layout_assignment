@@ -47,6 +47,7 @@ A Django-based web application for creating and managing customizable grid layou
 ### Prerequisites
 - Python 3.10+
 - Git
+- Docker (optional, for containerized deployment)
 
 ### Steps
 
@@ -87,6 +88,26 @@ A Django-based web application for creating and managing customizable grid layou
 7. **Access the application**
    Open your browser and navigate to `http://127.0.0.1:8000`.
 
+### Using Docker
+
+1. **Build the Docker image**
+   ```bash
+   docker build -t grid-layout-editor .
+   ```
+
+2. **Run the application with Docker Compose**
+   ```bash
+   docker-compose up
+   ```
+
+   預設會在 `http://127.0.0.1:8000` 啟動服務。
+
+3. **管理資料庫遷移**
+   若首次啟動，請在另一個終端機視窗執行：
+   ```bash
+   docker-compose exec web python manage.py migrate
+   docker-compose exec web python manage.py createsuperuser
+   ```
 ---
 
 ## Usage

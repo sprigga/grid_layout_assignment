@@ -57,21 +57,21 @@ def get_grid_layout(request):
         return JsonResponse({'status': 'success', 'grids': grid_list})
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
 
-@login_required
-def grid_list(request):
-    grids = Grid.objects.filter(layout_version__user=request.user)
-    grid_data = [{
-        'id': grid.id,
-        'name': grid.name,
-        'x': grid.x_position,
-        'y': grid.y_position,
-        'width': grid.width,
-        'height': grid.height,
-        'layout_id': grid.layout_version.id,
-        'created_at': grid.created_at,
-        'updated_at': grid.updated_at
-    } for grid in grids]
-    return render(request, 'grid_list.html', {'grids': grid_data})
+# @login_required
+# def grid_list(request):
+#     grids = Grid.objects.filter(layout_version__user=request.user)
+#     grid_data = [{
+#         'id': grid.id,
+#         'name': grid.name,
+#         'x': grid.x_position,
+#         'y': grid.y_position,
+#         'width': grid.width,
+#         'height': grid.height,
+#         'layout_id': grid.layout_version.id,
+#         'created_at': grid.created_at,
+#         'updated_at': grid.updated_at
+#     } for grid in grids]
+#     return render(request, 'grid_list.html', {'grids': grid_data})
 
 @login_required
 def layout_versions(request):

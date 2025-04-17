@@ -7,7 +7,7 @@ urlpatterns = [
     path('', views.grid_editor, name='grid_editor'),
     path('save-grid-layout/', views.save_grid_layout, name='save_grid_layout'),
     path('get-grid-layout/', views.get_grid_layout, name='get_grid_layout'),
-    path('grid-list/', views.grid_list, name='grid_list'),
+    # path('grid-list/', views.grid_list, name='grid_list'),
     path('layout-versions/', views.layout_versions, name='layout_versions'),
     path('delete-layout-version/<int:version_id>/', views.delete_layout_version, name='delete_layout_version'),
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),

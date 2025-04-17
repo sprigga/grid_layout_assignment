@@ -19,6 +19,45 @@ $(document).ready(function () {
         window.location.href = '/layout-versions/';
     });
 
+    // function addGrid(width, height, x, y, id = null) {
+    //     const gridId = id || `grid-${gridCounter++}`;
+    //     const grid = $(`<div class="grid" id="${gridId}"></div>`);
+
+    //     grid.css({
+    //         width: width + 'px',
+    //         height: height + 'px',
+    //         left: x + 'px',
+    //         top: y + 'px'
+    //     });
+
+    //     gridContainer.append(grid);
+
+    //     grid.draggable({
+    //         containment: "parent",
+    //         stop: function (event, ui) {
+    //             checkGridOverlap(grid);
+    //         }
+    //     });
+
+    //     grid.resizable({
+    //         containment: "parent",
+    //         minWidth: 20,
+    //         minHeight: 20,
+    //         stop: function (event, ui) {
+    //             checkGridOverlap(grid);
+    //         }
+    //     });
+
+    //     grid.on('dblclick', function (e) {
+    //         if (confirm('Are you sure you want to delete this grid?')) {
+    //             $(this).remove();
+    //         }
+    //         e.stopPropagation();
+    //     });
+
+    //     return grid;
+    // }
+
     function addGrid(width, height, x, y, id = null) {
         const gridId = id || `grid-${gridCounter++}`;
         const grid = $(`<div class="grid" id="${gridId}"></div>`);
@@ -30,17 +69,11 @@ $(document).ready(function () {
             top: y + 'px'
         });
 
-        // 儲存初始值（僅用於參考，不直接用於恢復）
-        grid.data('initial-left', x);
-        grid.data('initial-top', y);
-        grid.data('initial-width', width);
-        grid.data('initial-height', height);
-
-        // 初始化滑鼠指向時的位置（預設為初始位置）
-        grid.data('hover-left', x);
-        grid.data('hover-top', y);
-        grid.data('hover-width', width);
-        grid.data('hover-height', height);
+        // 預設合法位置與尺寸
+        grid.data('last-valid-left', x);
+        grid.data('last-valid-top', y);
+        grid.data('last-valid-width', width);
+        grid.data('last-valid-height', height);
 
         gridContainer.append(grid);
 
@@ -60,16 +93,6 @@ $(document).ready(function () {
             }
         });
 
-        // 滑鼠指標進入時記住當前位置
-        grid.on('mouseenter', function () {
-            const position = $(this).position();
-            $(this).data('hover-left', position.left);
-            $(this).data('hover-top', position.top);
-            $(this).data('hover-width', $(this).width());
-            $(this).data('hover-height', $(this).height());
-            console.log(`Grid ${gridId} hover position saved: (${position.left}, ${position.top}), size: (${$(this).width()}, ${$(this).height()})`);
-        });
-
         grid.on('dblclick', function (e) {
             if (confirm('Are you sure you want to delete this grid?')) {
                 $(this).remove();
@@ -79,6 +102,52 @@ $(document).ready(function () {
 
         return grid;
     }
+    
+
+    // function checkGridOverlap(currentGrid) {
+    //     const current = currentGrid.position();
+    //     const currentRect = {
+    //         left: current.left,
+    //         top: current.top,
+    //         right: current.left + currentGrid.width(),
+    //         bottom: current.top + currentGrid.height()
+    //     };
+
+    //     let hasOverlap = false;
+
+    //     $('.grid').not(currentGrid).each(function () {
+    //         const other = $(this).position();
+    //         const otherRect = {
+    //             left: other.left,
+    //             top: other.top,
+    //             right: other.left + $(this).width(),
+    //             bottom: other.top + $(this).height()
+    //         };
+
+    //         if (!(currentRect.right < otherRect.left ||
+    //             currentRect.left > otherRect.right ||
+    //             currentRect.bottom < otherRect.top ||
+    //             currentRect.top > otherRect.bottom)) {
+    //             hasOverlap = true;
+    //             return false;
+    //         }
+    //     });
+
+    //     if (hasOverlap) {
+    //         currentGrid.css({
+    //             left: currentGrid.data('last-valid-left') || currentRect.left,
+    //             top: currentGrid.data('last-valid-top') || currentRect.top,
+    //             width: currentGrid.data('last-valid-width') || (currentRect.right - currentRect.left),
+    //             height: currentGrid.data('last-valid-height') || (currentRect.bottom - currentRect.top)
+    //         });
+    //         alert('Grids cannot overlap!');
+    //     } else {
+    //         currentGrid.data('last-valid-left', currentRect.left);
+    //         currentGrid.data('last-valid-top', currentRect.top);
+    //         currentGrid.data('last-valid-width', currentRect.right - currentRect.left);
+    //         currentGrid.data('last-valid-height', currentRect.bottom - currentRect.top);
+    //     }
+    // }
 
     function checkGridOverlap(currentGrid) {
         const current = currentGrid.position();
@@ -101,26 +170,30 @@ $(document).ready(function () {
             };
 
             if (!(currentRect.right < otherRect.left ||
-                  currentRect.left > otherRect.right ||
-                  currentRect.bottom < otherRect.top ||
-                  currentRect.top > otherRect.bottom)) {
+                currentRect.left > otherRect.right ||
+                currentRect.bottom < otherRect.top ||
+                currentRect.top > otherRect.bottom)) {
                 hasOverlap = true;
                 return false;
             }
         });
 
         if (hasOverlap) {
-            // 若有重疊，恢復到滑鼠指標指向時記住的位置
             currentGrid.css({
-                left: currentGrid.data('hover-left') + 'px',
-                top: currentGrid.data('hover-top') + 'px',
-                width: currentGrid.data('hover-width') + 'px',
-                height: currentGrid.data('hover-height') + 'px'
+                left: currentGrid.data('last-valid-left'),
+                top: currentGrid.data('last-valid-top'),
+                width: currentGrid.data('last-valid-width'),
+                height: currentGrid.data('last-valid-height')
             });
-            alert('Grids cannot overlap! Reset to last hover position.');
+            alert('Grids cannot overlap!');
+        } else {
+            currentGrid.data('last-valid-left', currentRect.left);
+            currentGrid.data('last-valid-top', currentRect.top);
+            currentGrid.data('last-valid-width', currentRect.right - currentRect.left);
+            currentGrid.data('last-valid-height', currentRect.bottom - currentRect.top);
         }
-        // 不更新任何「最後有效位置」，因為需求是基於滑鼠指向位置恢復
     }
+
 
     function saveGridLayout() {
         const gridLayout = [];
@@ -169,20 +242,15 @@ $(document).ready(function () {
                     gridContainer.empty();
                     gridCounter = 0;
                     response.grids.forEach(function (grid) {
-                        const newGrid = addGrid(grid.width, grid.height, grid.x, grid.y, grid.id);
-                        // 載入時將 hover 位置初始化為載入位置
-                        newGrid.data('hover-left', grid.x);
-                        newGrid.data('hover-top', grid.y);
-                        newGrid.data('hover-width', grid.width);
-                        newGrid.data('hover-height', grid.height);
+                        addGrid(grid.width, grid.height, grid.x, grid.y, grid.id);
                     });
                 } else {
-                    gridContainer.empty(); // 未登入或無佈局時清空
+                    gridContainer.empty();  // 未登入或無佈局時清空
                 }
             },
             error: function (error) {
                 console.error('Load Failed:', error);
-                gridContainer.empty(); // 載入失敗時清空
+                gridContainer.empty();  // 載入失敗時清空
             }
         });
     }
